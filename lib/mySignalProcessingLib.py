@@ -43,7 +43,8 @@ def _format(ax, fig):
 
 
 def SIGNALgenerate(N=100, signal='delta', amplitude=1.0, phase=0.0,
-                   period=10, k=0, a=0.9, dist=None):
+                   period=10, k=0, a=0.9, dist=None,
+                   A=None, phi=None, P=None):
     '''
     Gera um sinal basico de N amostras. Devolve a tupla (x, n).
 
@@ -58,13 +59,25 @@ def SIGNALgenerate(N=100, signal='delta', amplitude=1.0, phase=0.0,
     a        : base da exponencial (|a| < 1 decai, |a| > 1 cresce)
     dist     : 'uniform' para aleatorio uniforme em [-1, 1] (padrao: gaussiano)
 
+    Apelidos da notacao da disciplina - A sin(wo n + phi), com wo = 2 pi / P:
+      A = amplitude, phi = phase, P = period
+    Os dois nomes funcionam; se voce passar os dois, o apelido vence.
+
     Exemplos:
         x, n = SIGNALgenerate(30, 'delta', k=4)          # d[n-4]
         x, n = SIGNALgenerate(30, 'step',  k=4)          # u[n-4]
         x, n = SIGNALgenerate(30, 'exp',   a=0.8)        # 0.8^n u[n]
         x, n = SIGNALgenerate(40, 'osc',   period=15)    # sin(2 pi n / 15)
+        x, n = SIGNALgenerate(40, 'osc',   P=10, phi=np.pi/2)  # = cosseno
         x, n = SIGNALgenerate(50, 'random', dist='uniform')
     '''
+    if A is not None:                  # A sin(wo n + phi)
+        amplitude = A
+    if phi is not None:
+        phase = phi
+    if P is not None:                  # wo = 2 pi / P
+        period = P
+
     if signal not in SIGNALS:
         raise ValueError(
             f'signal={signal!r} nao existe. Use um de: ' + ', '.join(SIGNALS))
